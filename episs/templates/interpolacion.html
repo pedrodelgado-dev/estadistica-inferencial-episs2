@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Interpolación lineal | Estadística Inferencial UNAJ</title>
+    <meta
+      content="Calcula una interpolación lineal entre dos puntos con gráfico y procedimiento paso a paso."
+      name="description"
+    />
+    <link href="/static/img/logo-unaj.svg" rel="icon" />
+    <link href="/static/css/estadistica.css" rel="stylesheet" />
+    <link href="/static/css/unaj.css" rel="stylesheet" />
+  </head>
+  <body class="unaj-app interpolation-page">
+    <a class="skip-link" href="#mainContent"> Saltar al contenido </a>
+    {% include "partials/header.html" %} {% include "partials/sidebar.html" %}
+    <main id="mainContent">
+      <div class="breadcrumb">
+        <a href="./#home"> Inicio </a>
+        <span> / </span>
+        <span> Interpolación lineal </span>
+        <span class="local-badge"> Aplicativo académico </span>
+      </div>
+      <div class="intro">
+        <p class="eyebrow">LABORATORIO DE ESTADÍSTICA</p>
+        <h1>Interpolación lineal</h1>
+        <p>Ingresa tus puntos y estima el valor intermedio.</p>
+      </div>
+      <div class="workspace">
+        <section class="card inputs controls">
+          <div class="section-top">
+            <h2>Datos de entrada</h2>
+            <button class="text-button" id="example" type="button">Cargar ejemplo</button>
+          </div>
+          <form id="form" novalidate="">
+            <fieldset>
+              <legend>
+                <span class="point blue"> </span>
+                Primer punto
+              </legend>
+              <div class="pair">
+                <label for="x1">
+                  x₁
+                  <input autocomplete="off" id="x1" inputmode="decimal" name="x1" value="10" />
+                </label>
+                <label for="y1">
+                  y₁
+                  <input autocomplete="off" id="y1" inputmode="decimal" name="y1" value="100" />
+                </label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>
+                <span class="point blue"> </span>
+                Segundo punto
+              </legend>
+              <div class="pair">
+                <label for="x2">
+                  x₂
+                  <input autocomplete="off" id="x2" inputmode="decimal" name="x2" value="20" />
+                </label>
+                <label for="y2">
+                  y₂
+                  <input autocomplete="off" id="y2" inputmode="decimal" name="y2" value="200" />
+                </label>
+              </div>
+            </fieldset>
+            <div class="target">
+              <label for="x">
+                <span class="point green"> </span>
+                Valor de x a consultar
+                <input autocomplete="off" id="x" inputmode="decimal" name="x" value="15" />
+              </label>
+            </div>
+            <p class="hint">Usa coma o punto decimal, sin separadores de miles.</p>
+            <p class="error" hidden="" id="error" role="alert"></p>
+            <button class="primary" type="submit">
+              CALCULAR
+              <span aria-hidden="true"> ↗ </span>
+            </button>
+            <button class="clear secondary" id="clear" type="button">LIMPIAR</button>
+          </form>
+        </section>
+        <section class="card output">
+          <div aria-live="polite" class="result">
+            <div>
+              <p class="eyebrow" id="kind">RESULTADO</p>
+              <div class="value" id="value">y = —</div>
+              <p id="caption">Ingresa tus puntos para comenzar.</p>
+            </div>
+            <span aria-hidden="true" class="result-icon"> ƒ(x) </span>
+          </div>
+          <div class="graph-head">
+            <h2>Representación gráfica</h2>
+            <span class="legend">
+              <i class="point blue"> </i>
+              Datos
+              <i class="point green"> </i>
+              Resultado
+            </span>
+          </div>
+          <svg
+            aria-label="Gráfico de interpolación lineal"
+            id="chart"
+            role="img"
+            viewbox="0 0 660 330"
+          ></svg>
+          <p class="chart-note" id="graphNote">La recta conecta los dos puntos conocidos.</p>
+        </section>
+      </div>
+      <section class="card procedure">
+        <div>
+          <p class="eyebrow">EL CÁLCULO, PASO A PASO</p>
+          <h2>¿Cómo se obtiene?</h2>
+          <div class="formula">
+            y = y₁ +
+            <span class="fraction">
+              <span> x − x₁ </span>
+              <span> x₂ − x₁ </span>
+            </span>
+            × (y₂ − y₁)
+          </div>
+          <p class="hint">El método supone una relación lineal entre los datos.</p>
+        </div>
+        <ol id="steps"></ol>
+      </section>
+      {% include "partials/footer.html" %}
+    </main>
+    <script src="/static/js/interpolation.js" type="module"></script>
+  </body>
+</html>

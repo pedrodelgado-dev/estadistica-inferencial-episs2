@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>Estadística Inferencial | UNAJ</title>
+    <meta
+      content="Pruebas Z, t, chi-cuadrado y F, comparación de medias, potencia y muestreo con procedimientos y gráficos."
+      name="description"
+    />
+    <link href="/static/img/logo-unaj.svg" rel="icon" />
+    <link href="/static/css/estadistica.css" rel="stylesheet" />
+    <link href="/static/css/unaj.css" rel="stylesheet" />
+  </head>
+  <body class="unaj-app">
+    <a class="skip-link" href="#mainContent"> Saltar al contenido </a>
+    {% include "partials/header.html" %} {% include "partials/sidebar.html" %}
+    <main id="mainContent">
+      <div class="breadcrumb">
+        <span> UNAJ </span>
+        <span aria-hidden="true"> / </span>
+        <span id="currentSection"> Inicio </span>
+        <span class="local-badge"> Aplicativo académico </span>
+      </div>
+      <section aria-labelledby="homeTitle" id="homeView">
+        <div class="home-hero">
+          <div class="hero-copy">
+            <p class="eyebrow">UNIVERSIDAD NACIONAL DE JULIACA</p>
+            <h1 id="homeTitle" tabindex="-1">
+              ESTADÍSTICA
+              <br />
+              INFERENCIAL
+              <span class="orange-dot"> . </span>
+            </h1>
+            <p class="hero-subtitle">
+              Aplicativo académico para el análisis y resolución de problemas estadísticos
+            </p>
+            <p class="hero-description">
+              Sistema desarrollado como herramienta de apoyo para el curso de Estadística
+              Inferencial de la Escuela Profesional de Ingeniería de Software y Sistemas de la
+              Universidad Nacional de Juliaca.
+            </p>
+            <div class="hero-tags">
+              <span> 8 herramientas disponibles </span>
+              <span> Procedimientos paso a paso </span>
+            </div>
+          </div>
+          <div aria-hidden="true" class="hero-visual">
+            <div class="visual-kicker">DEL DATO A LA EVIDENCIA</div>
+            <svg fill="none" viewbox="0 0 350 215">
+              <path
+                d="M25 45H330M25 90H330M25 135H330M25 180H330M70 25V185M140 25V185M210 25V185M280 25V185"
+                stroke="#d7e2ee"
+                stroke-width="1"
+              ></path>
+              <path
+                d="M25 179C83 179 85 167 108 125C130 82 139 38 178 38C217 38 226 82 248 125C271 167 273 179 330 179L330 180H25Z"
+                fill="#d9e6f3"
+              ></path>
+              <path
+                d="M25 179C83 179 85 167 108 125C130 82 139 38 178 38C217 38 226 82 248 125C271 167 273 179 330 179"
+                stroke="#203e68"
+                stroke-width="3"
+              ></path>
+              <path d="M248 30V185" stroke="#dc862f" stroke-dasharray="5 5" stroke-width="2"></path>
+              <circle
+                cx="248"
+                cy="125"
+                fill="#dc862f"
+                r="6"
+                stroke="white"
+                stroke-width="3"
+              ></circle>
+            </svg>
+            <div class="visual-caption">
+              <span> ANALIZAR </span>
+              <span> COMPRENDER </span>
+              <span> INTERPRETAR </span>
+            </div>
+          </div>
+        </div>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">EXPLORA EL LABORATORIO</p>
+            <h2>Herramientas estadísticas</h2>
+          </div>
+          <p>Elige un método para comenzar</p>
+        </div>
+        <div class="tool-grid">
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M4 19h16M5 17c3 0 3-12 7-12s4 12 7 12M12 4v16"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 01 </span>
+            </div>
+            <h3>Pruebas de hipótesis</h3>
+            <p>Contrasta una media o proporción con pruebas Z y t.</p>
+            <span class="method-tag"> Z · t · Proporción </span>
+            <a
+              aria-label="Abrir herramienta: Pruebas de hipótesis"
+              class="open-tool"
+              data-open="hypothesis"
+              href="#hypothesis"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M5 4v16M19 4v16M3 7h4M17 17h4M5 12h14M10 9v6M14 7v10"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 02 </span>
+            </div>
+            <h3>Análisis de varianzas</h3>
+            <p>Evalúa una varianza o compara la dispersión de dos poblaciones.</p>
+            <span class="method-tag"> χ² · F </span>
+            <a
+              aria-label="Abrir herramienta: Análisis de varianzas"
+              class="open-tool"
+              data-open="variance"
+              href="#variance"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M4 20V9h6v11M14 20V4h6v16M2 20h20"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 03 </span>
+            </div>
+            <h3>Comparación de medias</h3>
+            <p>Compara grupos independientes o mediciones relacionadas.</p>
+            <span class="method-tag"> Welch · t pareada </span>
+            <a
+              aria-label="Abrir herramienta: Comparación de medias"
+              class="open-tool"
+              data-open="compare"
+              href="#compare"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M3 12h18M5 8v8M19 8v8M12 9v6"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 04 </span>
+            </div>
+            <h3>Intervalos de confianza</h3>
+            <p>Estima medias y proporciones con su incertidumbre.</p>
+            <span class="method-tag"> Z · t · Wilson </span>
+            <a
+              aria-label="Abrir herramienta: Intervalos de confianza"
+              class="open-tool"
+              data-open="interval"
+              href="#interval"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 05 </span>
+            </div>
+            <h3>Tamaño de muestra</h3>
+            <p>Planifica la cantidad de observaciones para tu estudio.</p>
+            <span class="method-tag"> Media · Proporción </span>
+            <a
+              aria-label="Abrir herramienta: Tamaño de muestra"
+              class="open-tool"
+              data-open="sample"
+              href="#sample"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="m13 3-8 11h6l-1 7 9-12h-6z"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 06 </span>
+            </div>
+            <h3>Potencia y errores</h3>
+            <p>Explora la potencia, los errores α y β y el tamaño requerido.</p>
+            <span class="method-tag"> Potencia Z </span>
+            <a
+              aria-label="Abrir herramienta: Potencia y errores"
+              class="open-tool"
+              data-open="power"
+              href="#power"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M3 5h18M6 10h12M9 15h6M11 20h2"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 07 </span>
+            </div>
+            <h3>Selección de muestras</h3>
+            <p>Selecciona registros y descarga la muestra en formato CSV.</p>
+            <span class="method-tag"> MAS · Sistemático · Estratificado </span>
+            <a
+              aria-label="Abrir herramienta: Selección de muestras"
+              class="open-tool"
+              data-open="sampling"
+              href="#sampling"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-icon">
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  viewbox="0 0 24 24"
+                >
+                  <path d="M4 3v17h17M6 17 18 6M6 15v4M16 6h4"></path>
+                </svg>
+              </span>
+              <span class="tool-number"> 08 </span>
+            </div>
+            <h3>Interpolación lineal</h3>
+            <p>Estima un valor entre dos puntos y visualiza su recta.</p>
+            <span class="method-tag"> Dos puntos · Gráfico </span>
+            <a
+              aria-label="Abrir herramienta: Interpolación lineal"
+              class="open-tool"
+              href="interpolacion.html"
+            >
+              Abrir herramienta
+              <span aria-hidden="true"> ↗ </span>
+            </a>
+          </article>
+        </div>
+        <div class="home-note">
+          <span class="note-icon"> i </span>
+          <p>
+            <strong> Aprende a partir del procedimiento. </strong>
+            Cada herramienta presenta los resultados, su representación gráfica y los pasos del
+            cálculo. Selecciona el método e ingresa los datos de tu ejercicio.
+          </p>
+        </div>
+      </section>
+      <section aria-labelledby="infoTitle" hidden="" id="infoView">
+        <div class="intro">
+          <p class="eyebrow">IDENTIDAD Y DESARROLLO</p>
+          <h1 id="infoTitle" tabindex="-1">Acerca del aplicativo</h1>
+          <p>Una herramienta de apoyo para el aprendizaje universitario.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-identity">
+            <img alt="Logotipo UNAJ" height="101" src="/static/img/logo-unaj.svg" width="382" />
+            <span class="badge"> APLICATIVO ACADÉMICO </span>
+            <h2>Universidad Nacional de Juliaca</h2>
+            <p>Facultad de Ciencias de Ingenierías</p>
+            <p>Escuela Profesional de Ingeniería de Software y Sistemas</p>
+          </div>
+          <div class="about-content">
+            <p class="eyebrow">CURSO</p>
+            <h2>Estadística Inferencial</h2>
+            <p>
+              Aplicativo académico desarrollado con fines educativos. Reúne herramientas para
+              resolver ejercicios, revisar sus procedimientos e interpretar los resultados
+              estadísticos.
+            </p>
+            <div class="authors">
+              <p class="eyebrow">DOCENTE</p>
+              <div>
+                <span aria-hidden="true" class="avatar"> EP </span>
+                <span>
+                  <strong> Palaco Charaja Edgar Whashigton </strong>
+                  <small> Docente · Estadística Inferencial </small>
+                </span>
+              </div>
+            </div>
+            <div class="authors">
+              <p class="eyebrow">DESARROLLADO POR</p>
+              <div>
+                <span class="avatar"> PM </span>
+                <span>
+                  <strong> Mamani Delgado Pedro </strong>
+                  <small> Estudiante · Ingeniería de Software y Sistemas </small>
+                </span>
+              </div>
+              <div>
+                <span class="avatar"> DJ </span>
+                <span>
+                  <strong> Jove Benites Danny </strong>
+                  <small> Estudiante · Ingeniería de Software y Sistemas </small>
+                </span>
+              </div>
+            </div>
+            <p class="small">
+              Consulta los supuestos de cada método antes de interpretar sus resultados.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section hidden="" id="toolView">
+        <div class="intro">
+          <p class="eyebrow">LABORATORIO DE ESTADÍSTICA</p>
+          <h1 id="pageTitle" tabindex="-1">Prueba de hipótesis</h1>
+          <p id="pageDescription">Contrasta una media o proporción con evidencia estadística.</p>
+          <div class="workflow">
+            <span>
+              <b> 01 </b>
+              Ingresa los datos
+            </span>
+            <span>
+              <b> 02 </b>
+              Revisa el cálculo
+            </span>
+            <span>
+              <b> 03 </b>
+              Interpreta la evidencia
+            </span>
+          </div>
+        </div>
+        <div class="layout">
+          <section class="card controls">
+            <div class="card-head">
+              <h2 id="formTitle">Configura el problema</h2>
+              <button class="link" id="example" type="button">Ejemplo</button>
+            </div>
+            <form id="form" novalidate="">
+              <div id="fields"></div>
+              <p hidden="" id="error" role="alert"></p>
+              <button class="primary" type="submit">
+                CALCULAR
+                <span aria-hidden="true"> ↗ </span>
+              </button>
+              <button class="secondary" id="clear" type="button">LIMPIAR</button>
+            </form>
+            <p class="small">
+              Los datos se procesan al calcular y no se guardan en una base de datos.
+            </p>
+          </section>
+          <section aria-live="polite" class="results">
+            <div class="result-card">
+              <p class="eyebrow" id="resultType">PRUEBA DE UNA MEDIA · t DE STUDENT</p>
+              <h2 id="headline">Ingresa los datos</h2>
+              <p id="conclusion"></p>
+              <div class="metrics" id="metrics"></div>
+            </div>
+            <section class="card visual">
+              <div class="card-head">
+                <h2 id="graphTitle">Distribución y decisión</h2>
+                <button class="link" id="print" type="button">Imprimir / PDF</button>
+              </div>
+              <svg
+                aria-label="Gráfico del resultado"
+                id="chart"
+                role="img"
+                viewbox="0 0 700 280"
+              ></svg>
+              <p class="small" id="graphNote"></p>
+              <div id="extra"></div>
+            </section>
+            <section class="card">
+              <h2>Procedimiento paso a paso</h2>
+              <ol id="steps"></ol>
+              <div id="warnings"></div>
+            </section>
+          </section>
+        </div>
+        <section class="guide">
+          <h2>Elige el método adecuado</h2>
+          <div>
+            <article>
+              <h3>Z para una media</h3>
+              <p>
+                Cuando conoces la desviación estándar poblacional σ. Requiere normalidad poblacional
+                o una aproximación adecuada por tamaño muestral.
+              </p>
+            </article>
+            <article>
+              <h3>t de Student</h3>
+              <p>
+                Cuando σ es desconocida y utilizas la desviación muestral s. En muestras pequeñas,
+                revisa normalidad y valores atípicos.
+              </p>
+            </article>
+            <article>
+              <h3>Una proporción</h3>
+              <p>
+                Para éxitos sobre un total. La prueba Z requiere frecuencias esperadas suficientes;
+                el intervalo utiliza Wilson.
+              </p>
+            </article>
+            <article>
+              <h3>Varianzas χ² y F</h3>
+              <p>
+                Evalúa dispersión y compara la variabilidad entre dos procesos. Requiere normalidad
+                poblacional e independencia.
+              </p>
+            </article>
+            <article>
+              <h3>Medias y potencia</h3>
+              <p>
+                Welch para grupos independientes; t de diferencias para pares. Planifica la potencia
+                Z con un efecto relevante y σ conocida.
+              </p>
+            </article>
+            <article>
+              <h3>Muestreo de bases de datos</h3>
+              <p>
+                MAS, sistemático y estratificado. La cobertura de la base, la periodicidad y la
+                asignación influyen en la calidad de la muestra.
+              </p>
+            </article>
+          </div>
+          <p class="small">
+            Alcance: pruebas paramétricas, planificación y selección de muestras. Los intervalos son
+            bilaterales. La calculadora no interpreta enunciados automáticamente: identifica el
+            método e ingresa sus datos.
+          </p>
+          <p class="small">
+            Referencias:
+            <a
+              href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc22.htm"
+              rel="noopener"
+              target="_blank"
+            >
+              NIST: pruebas de una media
+            </a>
+            ·
+            <a
+              href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm"
+              rel="noopener"
+              target="_blank"
+            >
+              NIST: intervalo de Wilson
+            </a>
+            ·
+            <a href="https://online.stat.psu.edu/stat506/Lesson02" rel="noopener" target="_blank">
+              Penn State: tamaño de muestra
+            </a>
+          </p>
+        </section>
+      </section>
+      {% include "partials/footer.html" %}
+    </main>
+    <script src="/static/js/app.js" type="module"></script>
+  </body>
+</html>
