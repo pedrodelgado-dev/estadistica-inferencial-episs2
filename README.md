@@ -5,7 +5,7 @@ Los cálculos se ejecutan en **Python**. Flask sirve las páginas y la API; SciP
 proporciona las distribuciones normal, t de Student, χ² y F.
 
 **Docente:** Palaco Charaja Edgar Whashigton.  
-**Desarrolladores:** Mamani Delgado Pedro y Jove Benites Danny.  
+**Desarrolladores:** Mamani Delgado Pedro y Jove Benites Danny Rodrigo.  
 **Institución:** Universidad Nacional de Juliaca, Escuela Profesional de
 Ingeniería de Software y Sistemas.  
 **Curso:** Estadística Inferencial.
