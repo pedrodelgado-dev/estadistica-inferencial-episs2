@@ -1,21 +1,126 @@
+<div align="center">
+
+<img src="episs/static/img/logo-unaj.svg" alt="Logo de la Universidad Nacional de Juliaca" width="130">
+
 # Estadística Inferencial — EPISS / UNAJ
 
-Aplicación web educativa reorganizada en Python, HTML, CSS y módulos JavaScript.
-Los cálculos se ejecutan en **Python**. Flask sirve las páginas y la API; SciPy
-proporciona las distribuciones normal, t de Student, χ² y F.
+**Herramientas estadísticas para aprender, calcular e interpretar resultados.**
 
-**Docente:** Palaco Charaja Edgar Whashigton.  
-**Desarrolladores:** Mamani Delgado Pedro y Jove Benites Danny Rodrigo.  
-**Institución:** Universidad Nacional de Juliaca, Escuela Profesional de
-Ingeniería de Software y Sistemas.  
-**Curso:** Estadística Inferencial.
+Universidad Nacional de Juliaca  
+Facultad de Ciencias de Ingenierías  
+Escuela Profesional de Ingeniería de Software y Sistemas
 
-## Ejecutar en tu computadora
+![Python](https://img.shields.io/badge/Python-3.10%2B-1e3f67?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.1%2B-1e3f67?logo=flask&logoColor=white)
+![SciPy](https://img.shields.io/badge/SciPy-Cálculo_estadístico-e27c1f)
+![Proyecto académico](https://img.shields.io/badge/UNAJ-Proyecto_académico-e27c1f)
 
-Requiere Python 3.10 o posterior e Internet para instalar dependencias.
-Abre una terminal dentro de la carpeta que contiene `run.py`.
+</div>
 
-### macOS / Linux
+---
+
+## Presentación
+
+Aplicación web educativa del curso **Estadística Inferencial**. Reúne pruebas de hipótesis, intervalos de confianza, tamaño de muestra, muestreo e interpolación lineal, con procedimientos, interpretaciones y gráficos para acompañar el aprendizaje.
+
+Los cálculos se ejecutan en **Python con SciPy y NumPy**. **Flask** sirve las páginas y la API; **HTML, CSS y JavaScript** se encargan de la interfaz y la interacción.
+
+| Información académica | Detalle |
+|---|---|
+| Institución | Universidad Nacional de Juliaca — UNAJ |
+| Escuela profesional | Ingeniería de Software y Sistemas |
+| Curso | Estadística Inferencial |
+| Docente | Palaco Charaja Edgar Whashigton |
+| Desarrolladores | Mamani Delgado Pedro · Jove Benites Danny Rodrigo |
+
+## Contenido
+
+- [Herramientas disponibles](#herramientas-disponibles)
+- [Instalación y ejecución](#instalación-y-ejecución)
+- [Volver a abrir y cerrar la aplicación](#volver-a-abrir-y-cerrar-la-aplicación)
+- [Solución de problemas frecuentes](#solución-de-problemas-frecuentes)
+- [Organización de los archivos](#organización-de-los-archivos)
+- [Herramientas y API](#herramientas-y-api)
+- [Muestreo y datos](#muestreo-y-datos)
+- [Supuestos y límites](#supuestos-y-límites)
+- [Verificación y mantenimiento](#verificación-y-mantenimiento)
+- [Publicación](#publicación)
+- [Documentación y referencias](#documentación-y-referencias)
+
+## Herramientas disponibles
+
+| Herramienta | Qué permite calcular |
+|---|---|
+| Pruebas de hipótesis | Una media con Z o t de Student; una proporción con Z; alternativas izquierda, derecha y bilateral. |
+| Intervalos de confianza | Intervalos bilaterales para una media con Z/t y una proporción con Wilson. |
+| Tamaño de muestra | Tamaño para estimar una media o proporción, con corrección por población finita opcional. |
+| Pruebas de varianzas | Una varianza con χ² o comparación de dos varianzas con F. |
+| Comparación de medias | Pruebas de Welch, varianza combinada y muestras relacionadas. |
+| Potencia estadística | Potencia Z para una media con σ conocida, error β y tamaño necesario para una potencia objetivo. |
+| Muestreo | Aleatorio simple, sistemático y estratificado con asignación proporcional o de Neyman; descarga CSV. |
+| Interpolación lineal | Interpolación y extrapolación a partir de dos puntos. |
+
+La interfaz presenta resultados numéricos, explicaciones del procedimiento y gráficos según la herramienta elegida. Consulta los [supuestos y límites](#supuestos-y-límites) antes de interpretar un resultado.
+
+## Instalación y ejecución
+
+### Requisitos
+
+- **Python 3.10 o posterior**, con `pip`.
+- **Git**, si vas a clonar el repositorio. También puedes descargarlo mediante **Code → Download ZIP** y extraerlo.
+- Conexión a Internet para instalar las dependencias.
+- Un navegador web.
+
+### 1. Descargar el proyecto
+
+En PowerShell, CMD o una terminal:
+
+```bash
+git clone https://github.com/pedrodelgado-dev/estadistica-inferencial-episs2.git
+cd estadistica-inferencial-episs2
+```
+
+**Si ya lo descargaste, omite la clonación** y entra a la carpeta que contiene `run.py` y `requirements.txt`.
+
+Por ejemplo, si guardaste el proyecto en `D:\Estadistica\proyecto`:
+
+**PowerShell:**
+
+```powershell
+cd D:\Estadistica\proyecto
+dir
+```
+
+**CMD:**
+
+```cmd
+cd /d D:\Estadistica\proyecto
+dir
+```
+
+Ajusta la ruta a tu carpeta real. Si `dir` no muestra `run.py` y `requirements.txt`, todavía no estás en la raíz del proyecto.
+
+### 2. Crear el entorno e instalar dependencias
+
+**Windows — PowerShell:**
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe run.py
+```
+
+**Windows — CMD:**
+
+```cmd
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe run.py
+```
+
+Estos comandos usan directamente el Python del entorno virtual; **no necesitas activar el entorno ni cambiar la política de ejecución de PowerShell**.
+
+**macOS / Linux:**
 
 ```bash
 python3 -m venv .venv
@@ -24,22 +129,61 @@ python -m pip install -r requirements.txt
 python run.py
 ```
 
-### Windows PowerShell
+### 3. Abrir la página
 
-No hace falta activar el entorno:
+Con el servidor ejecutándose, abre:
+
+**[http://127.0.0.1:5000](http://127.0.0.1:5000)**
+
+Esta dirección funciona en la computadora donde iniciaste la aplicación. Mantén abierta la terminal mientras la usas.
+
+> La aplicación necesita su servidor Python. Abrir los HTML directamente, usar Live Server o subir únicamente los archivos estáticos no ejecuta los cálculos de la API.
+
+## Volver a abrir y cerrar la aplicación
+
+Después de la primera instalación, entra a la carpeta del proyecto y ejecuta solamente:
 
 ```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe run.py
 ```
 
-Abre **http://127.0.0.1:5000**. Detén el servidor con `Ctrl+C`.
-Si el puerto está ocupado, en macOS/Linux usa `PORT=5001 python run.py`;
-en PowerShell, `$env:PORT="5001"` antes de ejecutar `run.py`.
+El mismo comando funciona en PowerShell y CMD. En macOS/Linux puedes usar `.venv/bin/python run.py`.
 
-**No abras los HTML directamente ni uses Live Server:** los formularios necesitan
-la API Python. Las plantillas incluyen bloques compartidos que Flask ensambla.
+Para detener el servidor, vuelve a la terminal y presiona **Ctrl + C**. Cerrar la pestaña del navegador no detiene el proceso Python.
+
+## Solución de problemas frecuentes
+
+| Problema | Solución |
+|---|---|
+| `Could not open requirements file` | Ejecuta `dir` y entra a la carpeta que contiene `requirements.txt`. Si descargaste un ZIP, comprueba si hay otra carpeta del proyecto dentro. |
+| `git` no se reconoce | Instala Git y abre de nuevo la terminal, o descarga y extrae el ZIP desde GitHub. |
+| `py` no se reconoce | Comprueba que Python esté instalado. Si `python --version` funciona, usa `python -m venv .venv`. |
+| No se encuentra `.venv\Scripts\python.exe` | Crea el entorno con `py -m venv .venv` dentro de la carpeta del proyecto. |
+| Falta Flask, SciPy u otro módulo | Instala `requirements.txt` usando el Python de `.venv`, como se indica arriba. |
+| El navegador no puede conectarse | Comprueba que `run.py` siga ejecutándose y revisa los errores de la terminal. |
+| El puerto 5000 está ocupado | Configura otro puerto antes de iniciar el servidor y abre la dirección correspondiente. |
+
+**Cambiar de puerto en PowerShell:**
+
+```powershell
+$env:PORT="5001"
+.\.venv\Scripts\python.exe run.py
+```
+
+**En CMD:**
+
+```cmd
+set PORT=5001
+.venv\Scripts\python.exe run.py
+```
+
+**En macOS/Linux, con el entorno activado:**
+
+```bash
+PORT=5001 python run.py
+```
+
+Luego abre **[http://127.0.0.1:5001](http://127.0.0.1:5001)**.
 
 ## Organización de los archivos
 
@@ -162,26 +306,20 @@ historial persistente. No se usan servicios de cálculo externos.
 
 ## Verificación y mantenimiento
 
-Instala las herramientas de desarrollo y ejecuta:
+Con el entorno virtual activado, instala las herramientas de desarrollo y ejecuta:
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
-ruff check .
-ruff format --check .
+python -m ruff check .
+python -m ruff format --check .
 ```
 
-La migración incluye 120 casos de referencia numérica de la versión JavaScript
+La suite incluye casos de referencia numérica de la versión JavaScript
 en `tests/legacy_cases.json`, además de pruebas de entradas, API, interpolación,
 CSV, potencia y páginas. No es necesario Node para ejecutar las pruebas Python.
 Los casos de regresión permiten tolerancias numéricas pequeñas porque SciPy
 reemplaza las aproximaciones manuales anteriores.
-
-Verificación realizada: **142 pruebas Python aprobadas**, 19 combinaciones de
-formularios en navegador, listas con coma decimal, interpolación/extrapolación,
-limpieza de errores, descarga CSV y navegación. Revisión en escritorio de
-1440 px y móvil de 390 px, sin errores JavaScript ni desbordamiento horizontal.
-Entorno comprobado: Python 3.12.14, Flask 3.1.3, SciPy 1.17.0 y NumPy 2.3.5.
 
 Para modificar una fórmula, edita `episs/services/`. Para modificar su explicación,
 edita `episs/presentation/results.py`. Para modificar la pestaña Información,
@@ -202,8 +340,8 @@ gunicorn run:app --bind 0.0.0.0:8000
 ```
 
 Usa el puerto configurado por tu proveedor. `run.py` es para desarrollo local;
-el comando Gunicorn es para servir la aplicación en producción. Los cambios de
-este ZIP no se publican automáticamente ni modifican GitHub por sí mismos.
+el comando Gunicorn es para servir la aplicación en producción. La ejecución local no publica la aplicación en Internet. GitHub Pages no ejecuta
+este backend Python. El despliegue debe configurarse por separado.
 
 ## Documentación y referencias
 
@@ -213,3 +351,4 @@ este ZIP no se publican automáticamente ni modifican GitHub por sí mismos.
 - NIST, pruebas de una media: https://www.itl.nist.gov/div898/handbook/prc/section2/prc22.htm
 - NIST, Wilson: https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm
 - Penn State, tamaño de muestra: https://online.stat.psu.edu/stat506/Lesson02
+
