@@ -53,8 +53,10 @@ def hypothesis(r):
     data = f"n = {r['n']}; " + (
         f"éxitos = {r['success']}; p̂ = {fmt(r['estimate'])}."
         if prop
-        else f"x̄ = {fmt(r['mean'])}; {'s' if r['df'] else 'σ'} = {fmt(r['sd'])}."
+        else f"x̄ = {fmt(r['mean'])}; {'s' if r['method'] in ('t', 'z_sample') else 'σ'} = {fmt(r['sd'])}."
     )
+    if r.get("population"):
+        data += f" Población N = {r['population']}."
     if r["df"]:
         data += f" Grados de libertad = n − 1 = {r['df']}."
     steps = [
@@ -80,12 +82,6 @@ def hypothesis(r):
                 else "No emitir una decisión definitiva: la aproximación no cumple los requisitos."
             ),
         ),
-        (
-            "Intervalo bilateral complementario",
-            f"IC del {fmt(r['confidence'] * 100)} %: [{fmt(r['ci'][0])}; {fmt(r['ci'][1])}]. "
-            + ("Método de Wilson. " if prop else "")
-            + "Para una prueba unilateral este intervalo bilateral no es su regla de decisión equivalente.",
-        ),
     ]
     return base(
         f"PRUEBA {kind} · UNA {'PROPORCIÓN' if prop else 'MEDIA'}",
@@ -99,39 +95,6 @@ def hypothesis(r):
     )
 
 
-def interval(r):
-    prop = r["method"] == "proportion"
-    return base(
-        f"INTERVALO BILATERAL · {r['methodLabel']}",
-        f"[{fmt(r['ci'][0])}; {fmt(r['ci'][1])}]",
-        f"Intervalo de confianza del {fmt(r['confidence'] * 100)} % para {'la proporción poblacional' if prop else 'la media poblacional'}.",
-        [
-            ("Estimación", fmt(r["estimate"])),
-            ("Valor crítico", fmt(r["q"])),
-            ("Semiancho", fmt(r["margin"])),
-        ],
-        [
-            (
-                "Datos",
-                f"n = {r['n']}; estimación = {fmt(r['estimate'])}; confianza = {fmt(r['confidence'] * 100)} %. "
-                + (f"Éxitos = {r['success']}." if prop else f"Desviación = {fmt(r['sd'])}."),
-            ),
-            ("Fórmula", r["formula"]),
-            (
-                "Sustituir y calcular",
-                f"Valor crítico = {fmt(r['q'])}; centro = {fmt(r['center'])}; semiancho = {fmt(r['margin'])}. Límites: {fmt(r['center'])} ± {fmt(r['margin'])}.",
-            ),
-            (
-                "Interpretar",
-                f"En muestreos repetidos, aproximadamente el {fmt(r['confidence'] * 100)} % de los intervalos construidos por este procedimiento cubrirían el parámetro poblacional. No es la probabilidad de que el parámetro fijo esté en este intervalo.",
-            ),
-        ],
-        [
-            "Supone muestreo aleatorio e independencia. Para medias con muestras pequeñas, se requiere normalidad aproximada y ausencia de valores atípicos importantes."
-        ],
-        "Intervalo estimado",
-        charts.interval_chart(r),
-    )
 
 
 def sample_size(r):
@@ -172,59 +135,21 @@ def sample_size(r):
     )
 
 
-def variance(r):
-    op, h0 = alternative(r["tail"])
-    chi = r["type"] == "chi"
-    return base(
-        "UNA VARIANZA · χ²" if chi else "RAZÓN DE VARIANZAS · F",
-        decision(r),
-        decision_text(r),
-        test_metrics(r),
-        [
-            (
-                "Plantear la alternativa",
-                f"H₀: σ² {h0} {fmt(r['v0'])}. H₁: σ² {op} {fmt(r['v0'])}. Se evalúa en la frontera."
-                if chi
-                else f"H₀: σ₁²/σ₂² {h0} 1. H₁: σ₁²/σ₂² {op} 1.",
-            ),
-            (
-                "Calcular",
-                f"χ² = (n − 1)s²/σ₀² = {r['d1']} × {fmt(r['s1'] ** 2)} / {fmt(r['v0'])} = {fmt(r['statistic'])}."
-                if chi
-                else f"F = s₁²/s₂² = {fmt(r['s1'] ** 2)} / {fmt(r['s2'] ** 2)} = {fmt(r['statistic'])}. Se conserva el orden A/B.",
-            ),
-            (
-                "Grados de libertad y región",
-                f"gl₁ = {r['d1']}"
-                + (f"; gl₂ = {r['d2']}" if r["d2"] else "")
-                + f". Rechazar por debajo de {fmt(r['low'])} o por encima de {fmt(r['high'])}; 0 o ∞ no añaden una cola de rechazo.",
-            ),
-            (
-                "Intervalo bilateral",
-                f"IC {fmt(r['confidence'] * 100)} % para {'σ²' if chi else 'σ₁²/σ₂²'}: [{fmt(r['ci'][0])}; {fmt(r['ci'][1])}]. No equivale a la decisión unilateral.",
-            ),
-            (
-                "Decisión",
-                f"Comparar p = {p_text(r['p'])} con α = {fmt(r['alpha'])}. {decision(r)}.",
-            ),
-        ],
-        [
-            "Requiere poblaciones normales, muestreo aleatorio e independencia. Estas pruebas son sensibles a la falta de normalidad."
-        ],
-        "Distribución nula y rechazo",
-        charts.variance_curve(r),
-    )
 
 
 def compare(r):
     op, h0 = alternative(r["tail"])
     kind = r["type"]
     labels = {
+        "z": "MEDIAS INDEPENDIENTES · Z (σ conocidas)",
+        "z_sample": "MEDIAS INDEPENDIENTES · Z (muestras grandes)",
         "paired": "MEDIAS RELACIONADAS · t",
         "pooled": "MEDIAS INDEPENDIENTES · t COMBINADA",
         "welch": "MEDIAS INDEPENDIENTES · WELCH",
     }
     error = {
+        "z": f"EE = √(σA²/nA + σB²/nB) = {fmt(r['se'])}.",
+        "z_sample": f"EE = √(sA²/nA + sB²/nB) = {fmt(r['se'])}; ambas muestras ≥ 30.",
         "paired": f"Se calculan diferencias pareja a pareja. EE = sD/√n = {fmt(r['se'])}.",
         "welch": f"EE = √(sA²/nA + sB²/nB) = {fmt(r['se'])}. Grados de libertad de Welch–Satterthwaite.",
         "pooled": f"sp² = [(nA−1)sA² + (nB−1)sB²]/(nA+nB−2); EE = sp√(1/nA+1/nB) = {fmt(r['se'])}.",
@@ -250,12 +175,8 @@ def compare(r):
             ),
             ("Error estándar", error),
             (
-                "Estadístico t",
-                f"t = ({fmt(r['estimate'])} − {fmt(r['delta'])}) / {fmt(r['se'])} = {fmt(r['statistic'])}; gl = {fmt(r['df'])}.",
-            ),
-            (
-                "Intervalo bilateral para μA − μB",
-                f"[{fmt(r['ci'][0])}; {fmt(r['ci'][1])}], confianza {fmt(r['confidence'] * 100)} %. No equivale a una regla unilateral.",
+                "Estadístico Z" if kind in ("z", "z_sample") else "Estadístico t",
+                f"{'t' if r['df'] else 'Z'} = ({fmt(r['estimate'])} − {fmt(r['delta'])}) / {fmt(r['se'])} = {fmt(r['statistic'])}; gl = {fmt(r['df']) if r['df'] else 'no aplica'}.",
             ),
             ("Decisión", f"p {'≤' if r['reject'] else '>'} α. {decision(r)}."),
         ],
@@ -265,48 +186,31 @@ def compare(r):
     )
 
 
-def power(r):
-    conclusion = (
-        f"Se requieren al menos {r['required']} observaciones para una potencia de {fmt(r['target'] * 100)} % bajo este efecto y modelo."
-        if r["required"]
-        else "No se alcanza la potencia objetivo entre 2 y 1 000 000 observaciones. Revisa el efecto y la dirección de H₁."
-    )
-    return base(
-        "PLANIFICACIÓN · POTENCIA Z",
-        f"Potencia: {fmt(r['value'] * 100)} %",
-        conclusion,
-        [
-            ("Error tipo I · α", fmt(r["alpha"])),
-            ("Error tipo II · β", fmt(r["beta"])),
-            ("n mínimo", str(r["required"]) if r["required"] else "No alcanzable"),
-        ],
-        [
-            (
-                "Definir el efecto",
-                f"μ₁ − μ₀ = {fmt(r['delta'])}; σ = {fmt(r['sd'])}; n = {r['n']}.",
-            ),
-            (
-                "Desplazamiento",
-                f"λ = (μ₁−μ₀)√n/σ = {fmt(r['shift'])}. Valor crítico = {fmt(r['q'])}.",
-            ),
-            (
-                "Potencia y errores",
-                f"Potencia = P(rechazar H₀ | efecto indicado) = {fmt(r['value'])}. β = 1 − potencia = {fmt(r['beta'])}. α es la probabilidad de falso positivo bajo H₀.",
-            ),
-            (
-                "Optimizar n",
-                f"Se busca el menor entero n ≥ 2 que cumple la potencia objetivo, con límite de 1 000 000. Resultado: {r['required'] or 'no alcanzable'}.",
-            ),
-        ],
-        [
-            "Cálculo para una media, σ conocida e independencia. La potencia depende del efecto elegido; no es la probabilidad de que H₁ sea verdadera."
-        ],
-        "Potencia según tamaño de muestra",
-        charts.power_chart(r),
-    )
 
 
 def sampling(r):
+    if r.get("source") == "summary":
+        warnings = []
+        if any(group["n"] == 0 for group in r["allocation"]):
+            warnings.append("Hay estratos con muestra cero. Revisa n si necesitas representar todos los estratos.")
+        result = base(
+            "AFIJACIÓN PROPORCIONAL",
+            f"{r['n']} personas distribuidas entre {len(r['allocation'])} estratos",
+            "Se calcula cuántas personas corresponden a cada estrato. Para elegir personas concretas, usa Registros individuales.",
+            [("Población N", str(r["N"])), ("Muestra n", str(r["n"])),
+             ("Fracción de muestreo", fmt(r["n"] / r["N"] * 100) + " %")],
+            [("Población total", "N = " + " + ".join(str(g["N"]) for g in r["allocation"]) + f" = {r['N']}"),
+             ("Fórmula", "nₕ = (Nₕ / N) × n"),
+             *[(g["name"], f"({g['N']} / {r['N']}) × {r['n']} = {fmt(g['quota'])}; muestra asignada: {g['n']}.") for g in r["allocation"]],
+             ("Redondeo", "Si las cuotas tienen decimales, se toman sus partes enteras y las plazas restantes se asignan a los mayores restos. Los empates siguen el orden ingresado. La suma final es exactamente n.")],
+            warnings, "Fracción de la población a muestrear", charts.size_chart(r, selected=True),
+        )
+        result["table"] = {
+            "headers": ["Estrato", "Población Nₕ", "Proporción", "Muestra nₕ"],
+            "rows": [[g["name"], str(g["N"]), fmt(g["proportion"] * 100) + " %", str(g["n"])] for g in r["allocation"]]
+                    + [["Total", str(r["N"]), "100 %", str(r["n"])]]
+        }
+        return result
     method = r["method"]
     algorithm = (
         "Fisher–Yates parcial: en cada paso se elige uniformemente un registro de los que quedan."
@@ -379,3 +283,6 @@ def interpolation(r):
         ],
         "chart": charts.interpolation_chart(r),
     }
+
+
+

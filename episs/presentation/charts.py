@@ -2,7 +2,6 @@
 
 from scipy import stats
 
-from ..services.comparisons import power_at
 from .formatting import fmt
 
 
@@ -101,79 +100,18 @@ def rejection_curve(r):
     return chart.data
 
 
-def variance_curve(r):
-    distribution = stats.chi2(r["d1"]) if r["type"] == "chi" else stats.f(r["d1"], r["d2"])
-    end = float(distribution.ppf(0.995))
-    points = [(end * (i + 0.1) / 300.1, 0.0) for i in range(301)]
-    points = [(x, float(distribution.pdf(x))) for x, _ in points]
-    maximum = max(y for _, y in points)
-    chart = Chart(
-        f"Distribución {r['type']}, estadístico {fmt(r['statistic'])}.",
-        "Naranja claro: rechazo de H₀. Naranja oscuro: estadístico observado. La escala termina en el percentil 99,5 de la distribución nula.",
-    )
-
-    def X(x):
-        return 55 + 590 * x / end
-
-    def Y(y):
-        return 225 - 170 * y / maximum
-
-    chart.line(55, 225, 645, 225, "#a0aec0")
-    for x, y in points:
-        if x < r["low"] or r["high"] is not None and x > r["high"]:
-            chart.line(X(x), 225, X(x), Y(y), "#f2d2ad", **{"stroke-width": 2})
-    chart.add(
-        "path",
-        {
-            "d": path([(X(x), Y(y)) for x, y in points]),
-            "fill": "none",
-            "stroke": "#264a77",
-            "stroke-width": 2.5,
-        },
-    )
-    x = X(min(end, r["statistic"]))
-    chart.line(x, 60, x, 225, "#ce7624", **{"stroke-width": 3})
-    chart.text(
-        55,
-        32,
-        f"Observado: {fmt(r['statistic'])}"
-        + (" (fuera de escala)" if r["statistic"] > end else ""),
-        **{"fill": "#97551d", "font-size": 15},
-    )
-    for i in range(6):
-        chart.text(X(end * i / 5), 250, fmt(end * i / 5), **{"text-anchor": "middle"})
-    return chart.data
 
 
-def interval_chart(r):
-    lo, hi = r["ci"]
-    span = hi - lo or 1
-    chart = Chart(
-        f"Intervalo entre {fmt(lo)} y {fmt(hi)}. Estimación {fmt(r['estimate'])}.",
-        "Naranja: intervalo de confianza bilateral. Punto: estimación muestral.",
-    )
-    chart.line(70, 140, 630, 140, "#dbe5ef", **{"stroke-width": 8})
-    chart.line(100, 140, 600, 140, "#ce7624", **{"stroke-width": 8})
-    for value in (lo, hi):
-        x = 100 + (value - lo) / span * 500
-        chart.line(x, 120, x, 160, "#ce7624", **{"stroke-width": 3})
-        chart.text(x, 190, fmt(value), **{"text-anchor": "middle", "font-size": 16})
-    chart.add(
-        "circle",
-        {"cx": 100 + (r["estimate"] - lo) / span * 500, "cy": 140, "r": 8, "fill": "#193554"},
-    )
-    chart.text(
-        350, 80, f"Estimación: {fmt(r['estimate'])}", **{"text-anchor": "middle", "font-size": 16}
-    )
-    return chart.data
 
 
 def size_chart(r, selected=False):
     n = r["n"]
+    summary = r.get("source") == "summary"
     total = r["N"] if selected else r.get("population", n)
     chart = Chart(
-        f"{n} observaciones {'seleccionadas' if selected else 'requeridas'}.",
-        "Vista previa: primeros 100 identificadores. El CSV contiene toda la selección."
+        f"{n} observaciones {'a distribuir' if summary else 'seleccionadas' if selected else 'requeridas'}.",
+        "La tabla muestra la muestra asignada a cada estrato; no se han seleccionado personas individuales."
+        if summary else "Vista previa: primeros 100 identificadores. El CSV contiene toda la selección."
         if selected
         else "Se redondea hacia arriba para alcanzar la precisión solicitada.",
     )
@@ -206,31 +144,6 @@ def size_chart(r, selected=False):
     return chart.data
 
 
-def power_chart(r):
-    end = min(1_000_000, max(100, r["n"] * 2, (r["required"] or 0) * 1.5))
-    chart = Chart(
-        f"Potencia {fmt(r['value'] * 100)} por ciento para n {r['n']}.",
-        "Eje horizontal: n. Línea azul: potencia. Línea punteada: objetivo. Punto naranja: tamaño actual.",
-    )
-
-    def X(n):
-        return 55 + 590 * (n - 2) / (end - 2)
-
-    def Y(p):
-        return 225 - 170 * p
-
-    points = []
-    for i in range(201):
-        n = 2 + (end - 2) * i / 200
-        points.append((X(n), Y(power_at(n, r["sd"], r["delta"], r["tail"], r["q"]))))
-    chart.add("path", {"d": path(points), "stroke": "#264a77", "stroke-width": 3, "fill": "none"})
-    chart.line(55, Y(r["target"]), 645, Y(r["target"]), "#a3662f", **{"stroke-dasharray": "5 5"})
-    chart.add("circle", {"cx": X(r["n"]), "cy": Y(r["value"]), "r": 5, "fill": "#ce7624"})
-    for i in range(5):
-        n = 2 + (end - 2) * i / 4
-        chart.text(X(n), 250, str(round(n)), **{"text-anchor": "middle"})
-    chart.text(55, 30, f"Potencia 0–100 % · objetivo {fmt(r['target'] * 100)} %")
-    return chart.data
 
 
 def interpolation_chart(r):

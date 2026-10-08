@@ -1,4 +1,4 @@
-"""Media, desviación, pruebas de una muestra, intervalos y tamaño muestral."""
+"""Media, desviación, pruebas de una muestra y tamaño muestral."""
 
 import math
 import statistics as descriptive
@@ -25,7 +25,7 @@ def summarize(values):
 
 
 def prepare(data, hypothesis=False):
-    method = choice(data.get("method"), ("z", "t", "proportion"), "Método")
+    method = choice(data.get("method"), ("z", "z_sample", "t", "proportion"), "Método")
     confidence, alpha = level(data.get("confidence"))
     result = {"method": method, "confidence": confidence, "alpha": alpha}
     if method == "proportion":
@@ -45,6 +45,8 @@ def prepare(data, hypothesis=False):
                 mean=number(data.get("mean"), "Media"),
                 sd=positive(data.get("sd"), "Desviación"),
             )
+    if method == "z_sample" and result["n"] < 30:
+        raise InputError("Z con s requiere una muestra de al menos 30 observaciones.")
     if hypothesis:
         result["tail"] = tail(data.get("tail"))
         result["nullValue"] = (
@@ -55,21 +57,6 @@ def prepare(data, hypothesis=False):
     return result
 
 
-def wilson(success, n, alpha):
-    estimate = success / n
-    q = float(stats.norm.isf(alpha / 2))
-    denominator = 1 + q * q / n
-    center = (estimate + q * q / (2 * n)) / denominator
-    margin = q * math.sqrt(estimate * (1 - estimate) / n + q * q / (4 * n * n)) / denominator
-    return {
-        "estimate": estimate,
-        "q": q,
-        "center": center,
-        "margin": margin,
-        "ci": [max(0.0, center - margin), min(1.0, center + margin)],
-        "methodLabel": "Wilson",
-        "formula": "Centro = (p̂ + z²/2n)/(1 + z²/n); semiancho = z·√[p̂(1−p̂)/n + z²/4n²]/(1 + z²/n)",
-    }
 
 
 def p_value(distribution, statistic, alternative):
@@ -82,32 +69,10 @@ def p_value(distribution, statistic, alternative):
     return finite_result(min(1.0, max(0.0, float(value))))
 
 
-def interval(data):
-    d = prepare(data)
-    if d["method"] == "proportion":
-        return {**d, **wilson(d["success"], d["n"], d["alpha"])}
-    df = d["n"] - 1 if d["method"] == "t" else None
-    distribution = stats.t(df) if df else stats.norm()
-    q = float(distribution.isf(d["alpha"] / 2))
-    se = finite_result(d["sd"] / math.sqrt(d["n"]))
-    margin = finite_result(q * se)
-    return {
-        **d,
-        "estimate": d["mean"],
-        "center": d["mean"],
-        "q": q,
-        "margin": margin,
-        "df": df,
-        "se": se,
-        "ci": [d["mean"] - margin, d["mean"] + margin],
-        "methodLabel": "t de Student" if df else "Z",
-        "formula": "IC = x̄ ± valor crítico × desviación / √n",
-    }
 
 
 def hypothesis(data):
     d = prepare(data, hypothesis=True)
-    confidence_interval = interval(d)
     df = d["n"] - 1 if d["method"] == "t" else None
     distribution = stats.t(df) if df else stats.norm()
     warnings = ["Supuestos: muestra aleatoria y observaciones independientes."]
@@ -126,13 +91,21 @@ def hypothesis(data):
         estimate = d["mean"]
         se = d["sd"] / math.sqrt(d["n"])
         symbol = "t" if df else "Z"
-        deviation = "s" if df else "σ"
+        deviation = "s" if d["method"] in ("t", "z_sample") else "σ"
         formula = f"{symbol} = (x̄ − μ₀) / ({deviation} / √n)"
         substitution = f"({d['mean']:g} − {d['nullValue']:g}) / ({d['sd']:g} / √{d['n']})"
         if d["n"] < 30:
             warnings.append(
                 "Muestra pequeña: comprueba normalidad aproximada y ausencia de valores atípicos importantes."
             )
+    population = data.get("population")
+    if population not in (None, ""):
+        population = count(population, "Población N", d["n"] + 1, 10**12)
+        correction = math.sqrt((population - d["n"]) / (population - 1))
+        se *= correction
+        d["population"] = population
+        formula += "; EE corregido = EE × √[(N−n)/(N−1)]"
+        substitution += f"; factor de población finita = {correction:g}"
     if se <= 0:
         raise InputError("El error estándar es cero. Revisa la desviación o la proporción.")
     statistic = finite_result((estimate - d["nullValue"]) / se)
@@ -147,7 +120,6 @@ def hypothesis(data):
         "reject": p <= d["alpha"],
         "adequate": adequate,
         "critical": float(distribution.isf(d["alpha"] / (2 if d["tail"] == "two" else 1))),
-        "ci": confidence_interval["ci"],
         "formula": formula,
         "substitution": substitution,
         "warnings": warnings,

@@ -76,15 +76,16 @@ def allocate(groups, n, neyman=False):
     allocation = [0] * len(groups)
     remaining, active = n, list(range(len(groups)))
     while remaining and active:
-        weights = [len(groups[i]["rows"]) * (groups[i]["sd"] if neyman else 1) for i in active]
+        sizes = {i: groups[i]["N"] if "N" in groups[i] else len(groups[i]["rows"]) for i in active}
+        weights = [sizes[i] * (groups[i]["sd"] if neyman else 1) for i in active]
         if all(weight == 0 for weight in weights):
-            weights = [len(groups[i]["rows"]) for i in active]
+            weights = [sizes[i] for i in active]
         total = sum(weights)
         shares = [
             {
                 "i": i,
                 "quota": remaining * weights[j] / total,
-                "cap": len(groups[i]["rows"]) - allocation[i],
+                "cap": sizes[i] - allocation[i],
             }
             for j, i in enumerate(active)
         ]
@@ -103,14 +104,50 @@ def allocate(groups, n, neyman=False):
         for share in shares:
             if remaining == 0:
                 break
-            if allocation[share["i"]] < len(groups[share["i"]]["rows"]):
+            if allocation[share["i"]] < sizes[share["i"]]:
                 allocation[share["i"]] += 1
                 remaining -= 1
         break
     return allocation
 
 
+def summary_allocation(data):
+    """Afijación proporcional con totales: nₕ = (Nₕ / N) × n.
+
+    Los restos mayores conservan exactamente n al repartir cuotas no enteras.
+    No se crean personas ficticias ni se seleccionan registros individuales.
+    """
+    choice(data.get("method"), ("stratified",), "Método para datos resumidos")
+    choice(data.get("allocation", "proportional"), ("proportional",), "Asignación con totales")
+    raw = data.get("strata")
+    if not isinstance(raw, str):
+        raise InputError("Introduce un estrato por línea: nombre;cantidad.")
+    lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    if not 1 <= len(lines) <= 1000:
+        raise InputError("Introduce entre 1 y 1000 estratos.")
+    groups, names = [], set()
+    for line in lines:
+        parts = [part.strip() for part in line.split(";")]
+        if len(parts) != 2 or not parts[0]:
+            raise InputError("Usa nombre;cantidad, sin encabezado, en cada línea.")
+        name = parts[0]
+        if name.casefold() in names:
+            raise InputError("Cada estrato debe tener un nombre diferente.")
+        names.add(name.casefold())
+        groups.append({"name": name, "N": count(parts[1], f"Población de {name}")})
+    total = sum(group["N"] for group in groups)
+    n = count(data.get("n"), "Tamaño de la muestra n", 1, total)
+    amounts = allocate(groups, n)
+    for group, amount in zip(groups, amounts):
+        group.update(n=amount, proportion=group["N"] / total, quota=group["N"] * n / total)
+    return {"source": "summary", "method": "stratified", "allocationType": "proportional",
+            "N": total, "n": n, "allocation": groups}
+
+
 def sampling(data):
+    source = choice(data.get("source", "records"), ("records", "summary"), "Tipo de datos")
+    if source == "summary":
+        return summary_allocation(data)
     rows = parse_records(data.get("records", data.get("rows")))
     n = count(data.get("n"), "Tamaño n", 1, len(rows))
     seed = count(data.get("seed"), "Semilla", 0, 2**32 - 1)

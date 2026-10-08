@@ -12,7 +12,8 @@ function oneSampleForm() {
       [
         ['t', 'Media · t (σ desconocida)'],
         ['z', 'Media · Z (σ conocida)'],
-        ['proportion', 'Proporción · Z / IC Wilson'],
+        ['z_sample', 'Media · Z (s conocida, n ≥ 30)'],
+        ['proportion', 'Proporción · Z'],
       ],
       method,
     ),
@@ -45,8 +46,8 @@ function oneSampleForm() {
       fields.push(
         field(
           'sd',
-          method === 't' ? 'Desviación muestral s' : 'Desviación poblacional σ',
-          method === 't' ? '5' : '15',
+          ['t', 'z_sample'].includes(method) ? 'Desviación muestral s' : 'Desviación poblacional σ',
+          ['t', 'z_sample'].includes(method) ? '5' : '15',
         ),
       );
     }
@@ -64,6 +65,7 @@ function oneSampleForm() {
     );
   }
   fields.push(
+    field('population', 'Población N (opcional; dejar vacío si no aplica)'),
     confidence(),
     hint(
       'Se analiza una sola muestra. Ingresa valores numéricos; no pegues el enunciado completo.',
@@ -111,30 +113,6 @@ function sampleForm() {
   return fields.join('');
 }
 
-function varianceForm() {
-  const type = state.advancedType.variance;
-  const fields = [
-    select(
-      'advancedType',
-      'Contraste',
-      [
-        ['chi', 'Una varianza · χ²'],
-        ['f', 'Dos varianzas · F'],
-      ],
-      type,
-    ),
-    field('n1', 'Tamaño de muestra n₁', '25'),
-    field('s1', 'Desviación muestral s₁', '6'),
-  ];
-  if (type === 'chi') fields.push(field('v0', 'Varianza hipotética σ₀² (no desviación)', '25'));
-  else
-    fields.push(
-      field('n2', 'Tamaño de muestra n₂', '30'),
-      field('s2', 'Desviación muestral s₂', '4'),
-    );
-  fields.push(tail(), confidence());
-  return fields.join('');
-}
 
 function compareForm() {
   const type = state.advancedType.compare;
@@ -143,7 +121,9 @@ function compareForm() {
       'advancedType',
       'Diseño y método',
       [
-        ['welch', 'Independientes · t de Welch'],
+        ['z', 'Independientes · Z (σ conocidas)'],
+        ['z_sample', 'Independientes · Z (s, ambas n ≥ 30)'],
+        ['welch', 'Independientes · t, varianzas diferentes'],
         ['pooled', 'Independientes · varianzas iguales'],
         ['paired', 'Relacionadas · t de diferencias'],
       ],
@@ -161,13 +141,13 @@ function compareForm() {
       '<div class="group-label">GRUPO A · p. ej., backend</div>',
       row(
         field('mean1', 'Media A', '3200'),
-        field('s1', 'Desviación A', '450'),
+        field('s1', type === 'z' ? 'Desviación poblacional σ₁' : 'Desviación muestral s₁', '450'),
         field('n1', 'Tamaño A', '30'),
       ),
       '<div class="group-label">GRUPO B · p. ej., frontend</div>',
       row(
         field('mean2', 'Media B', '2900'),
-        field('s2', 'Desviación B', '400'),
+        field('s2', type === 'z' ? 'Desviación poblacional σ₂' : 'Desviación muestral s₂', '400'),
         field('n2', 'Tamaño B', '28'),
       ),
     );
@@ -176,19 +156,6 @@ function compareForm() {
   return fields.join('');
 }
 
-function powerForm() {
-  return [
-    hint(
-      'Prueba Z de una media con σ poblacional conocida. Planificación bajo un efecto específico.',
-    ),
-    field('sd', 'Desviación poblacional σ', '15'),
-    field('delta', 'Efecto real μ₁ − μ₀ (con signo)', '5'),
-    field('n', 'Tamaño actual n', '50'),
-    field('target', 'Potencia objetivo (0 a 1)', '0.8'),
-    tail(),
-    confidence(),
-  ].join('');
-}
 
 function samplingForm() {
   const type = state.advancedType.sampling;
@@ -205,6 +172,20 @@ function samplingForm() {
     ),
   ];
   if (type === 'stratified') {
+    fields.push(select('samplingSource', 'Tipo de datos', [
+      ['summary', 'Totales por estrato · ejemplo 7.2.3'],
+      ['records', 'Registros individuales'],
+    ], state.samplingSource));
+    if (state.samplingSource === 'summary') {
+      fields.push(
+        hint('Afijación proporcional: reparte la muestra según el tamaño de cada estrato. La población total N se calcula sumando las cantidades.'),
+        area('strata', 'Estratos · nombre;cantidad por línea',
+          'Públicos;6000\nPrivados parroquiales;3000\nPrivados no parroquiales;1000'),
+        hint('Sin encabezado ni separadores de miles. Ejemplo: Públicos;6000. No necesitas la lista de personas.'),
+        field('n', 'Tamaño de la muestra n', '600'),
+      );
+      return fields.join('');
+    }
     fields.push(
       select(
         'allocation',
@@ -241,13 +222,11 @@ function samplingForm() {
   return fields.join('');
 }
 
+
 const builders = {
   hypothesis: oneSampleForm,
-  interval: oneSampleForm,
   sample: sampleForm,
-  variance: varianceForm,
   compare: compareForm,
-  power: powerForm,
   sampling: samplingForm,
 };
 
@@ -258,7 +237,7 @@ export function renderForm() {
   $('formTitle').textContent =
     state.mode === 'sample' ? 'Planifica tu muestra' : 'Datos del análisis';
   $('fields').innerHTML = builders[state.mode]();
-  for (const id of ['method', 'source', 'parameter', 'finite', 'advancedType']) {
+  for (const id of ['method', 'source', 'parameter', 'finite', 'advancedType', 'samplingSource']) {
     $(id)?.addEventListener('change', () => {
       if (id === 'advancedType') state.advancedType[state.mode] = $(id).value;
       else state[id] = id === 'finite' ? $(id).value === 'yes' : $(id).value;

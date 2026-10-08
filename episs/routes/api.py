@@ -13,11 +13,8 @@ api = Blueprint("api", __name__, url_prefix="/api")
 # Una entrada por herramienta; las variantes se seleccionan en el formulario.
 CALCULATORS = {
     "hypothesis": (statistics.hypothesis, results.hypothesis),
-    "interval": (statistics.interval, results.interval),
     "sample": (statistics.sample_size, results.sample_size),
-    "variance": (comparisons.variance, results.variance),
     "compare": (comparisons.compare, results.compare),
-    "power": (comparisons.power, results.power),
     "sampling": (sampling.sampling, results.sampling),
     "interpolation": (interpolation.interpolate, results.interpolation),
 }

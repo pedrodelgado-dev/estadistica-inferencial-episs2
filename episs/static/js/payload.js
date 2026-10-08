@@ -7,6 +7,10 @@ const value = (id) => $(id)?.value;
 export function gather() {
   const { mode, method, source, parameter, finite, advancedType } = state;
   if (mode === 'sampling') {
+    if (advancedType.sampling === 'stratified' && state.samplingSource === 'summary') {
+      return { source: 'summary', method: 'stratified', allocation: 'proportional',
+        strata: value('strata'), n: value('n') };
+    }
     return {
       records: value('records'),
       n: value('n'),
@@ -31,17 +35,6 @@ export function gather() {
       population: value('population'),
     };
   }
-  if (mode === 'variance') {
-    return {
-      ...common,
-      type: advancedType.variance,
-      n1: value('n1'),
-      n2: value('n2'),
-      s1: value('s1'),
-      s2: value('s2'),
-      v0: value('v0'),
-    };
-  }
   if (mode === 'compare') {
     return {
       ...common,
@@ -57,15 +50,6 @@ export function gather() {
       s2: value('s2'),
     };
   }
-  if (mode === 'power') {
-    return {
-      ...common,
-      sd: value('sd'),
-      delta: value('delta'),
-      n: value('n'),
-      target: value('target'),
-    };
-  }
   return {
     ...common,
     method,
@@ -76,5 +60,6 @@ export function gather() {
     sd: value('sd'),
     success: value('success'),
     nullValue: value('nullValue'),
+    population: value('population'),
   };
 }

@@ -56,6 +56,36 @@ export function showResults(view) {
   );
   drawChart(view.chart);
 
+  if (view.table) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'allocation-table';
+    const table = document.createElement('table');
+    const caption = document.createElement('caption');
+    caption.textContent = 'Distribución de la muestra por estrato';
+    table.append(caption);
+    const head = document.createElement('thead');
+    const header = document.createElement('tr');
+    for (const title of view.table.headers) {
+      const cell = document.createElement('th');
+      cell.scope = 'col';
+      cell.textContent = title;
+      header.append(cell);
+    }
+    head.append(header);
+    const body = document.createElement('tbody');
+    for (const values of view.table.rows) {
+      const row = document.createElement('tr');
+      for (const value of values) {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(cell);
+      }
+      body.append(row);
+    }
+    table.append(head, body);
+    wrapper.append(table);
+    $('extra').append(wrapper);
+  }
   if (view.preview) {
     const paragraph = document.createElement('p');
     paragraph.className = 'sample-preview';
