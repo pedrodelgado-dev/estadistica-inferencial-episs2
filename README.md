@@ -1,6 +1,6 @@
 # Calculadora de Estadística Inferencial · UNAJ / EPISS
 
-Versión ajustada a `1.pdf` y `Materialdepruebadehipotesis.pdf`, con interpolación lineal conservada.
+con interpolación lineal conservada.
 Docente: Palaco Charaja Edgar Whashigton.
 
 ## Ejecutar en Visual Studio Code
